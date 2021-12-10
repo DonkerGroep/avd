@@ -1,0 +1,1 @@
+Start-Process -FilePath "C:\Packages\Software\Sophos\SophosEndpointInstall.bat" -WindowStyle Hidden -Wait
