@@ -3,20 +3,23 @@
     Adds an WVD Session Host to an existing WVD Hostpool *** SPRING UPDATE 2020***
 .DESCRIPTION  
     This scripts adds an WVD Session Host to an existing WVD Hostpool by performing the following action:
-    - Download the WVD agent
-    - Download the WVD Boot Loader
-    - Install the WVD Agent, using the provided hostpoolRegistrationToken
-    - Install the WVD Boot Loader
-    - Set the WVD Host into drain mode (optionally)
+    - Download the AVD agent
+    - Download the AVD Boot Loader
+    - Install the AVD Agent, using the provided hostpoolRegistrationToken
+    - Install the AVD Boot Loader
+    - Set the AVD Host into drain mode (optionally)
     - Create the Workspace <-> App Group Association (optionally)
     The script is designed and optimized to run as PowerShell Extension as part of a JSON deployment.
 .NOTES  
-    File Name  : add-WVDHostToHostpoolSpringV3.ps1
+    File Name  : add-AVDHostToHostpoolSpringV3.ps1
     Author     : Freek Berson - Wortell - RDSGurus
     Version    : v1.0.0
+    File Name  : add-AVDHostToHostpool.ps1
+    Author     : Kees Dijksma - Donker Groep
+    Version    : v1.0.1    
 .EXAMPLE
-    .\add-WVDHostToHostpoolSpringV3.ps11 existingWVDWorkspaceName existingWVDHostPoolName `
-      existingWVDAppGroupName servicePrincipalApplicationID servicePrincipalPassword azureADTenantID 
+    .\add-AVDHostToHostpoolps1 existingAVDWorkspaceName existingAVDHostPoolName `
+      existingAVDAppGroupName servicePrincipalApplicationID servicePrincipalPassword azureADTenantID 
       resourceGroupName azureSubscriptionID Drainmode createWorkspaceAppGroupAsso >> <yourlogdir>\dd-WVDHostToHostpoolSpring.log
 .DISCLAIMER
     Use at your own risk. This scripts are provided AS IS without warranty of any kind. The author further disclaims all implied
@@ -239,7 +242,7 @@ $workers = foreach ($f in $files)
 $workers.Result
 
 #Authenticatie against the WVD Tenant
-log "Authenticatie against the WVD Tenant"
+log "Authenticatie against the AVD Tenant"
 Connect-AzAccount -ServicePrincipal -Credential $ServicePrincipalCreds  -Tenant $azureADTenantID
 
 #Obtain RdsRegistrationInfotoken
@@ -259,9 +262,9 @@ InstallRDAgents -AgentBootServiceInstallerFolder $RootFolder -AgentInstallerFold
 #Set WVD Session Host in drain mode
 if ($drainmode -eq "Yes")
 {
-    #Wait 1 minute to let the WVD host register before configuring Drain mode
-    Start-sleep 60
-    Log "Set WVD Session Host in drain mode"
+    #Wait 2 minutes to let the WVD host register before configuring Drain mode
+    Start-sleep 120
+    Log "Set AVD Session Host in drain mode"
     $CurrentHostName = [System.Net.Dns]::GetHostByName($env:computerName).hostname
     Update-AzWvdSessionHost -SubscriptionId "$azureSubscriptionID" -ResourceGroupName "$resourceGroupName" -HostPoolName $existingWVDHostPoolName -Name $CurrentHostName -AllowNewSession:$false
 }
